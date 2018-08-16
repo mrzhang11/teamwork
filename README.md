@@ -10,9 +10,9 @@ research：研究性工作
 
 resource：可以把模型等放在这里
 
-### 复盘时间
+最后运行的pipeline代码放在外层就可以，入口为run.py/run.sh。
 
-Friday/Sunday:  10:00pm
+
 
 ###  
 
