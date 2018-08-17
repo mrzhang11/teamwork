@@ -7,6 +7,7 @@ from sklearn.metrics.pairwise import pairwise_distances_argmin
 import numpy as np
 import os
 
+
 def nearest_neighbor(s_samples, s_classes):
     """
     :param s_samples: (n_samples, attributes_dim)
@@ -25,17 +26,16 @@ def accuracy(y_pred, y_true):
     """
     correct = 0
     for i in range(len(y_pred)):
-        if y_true[i]==y_pred[i]:
+        if y_true[i] == y_pred[i]:
             correct += 1
 
-    return correct/len(y_pred)
+    return correct / len(y_pred)
 
-def submit(imgs, predictions, label_map, filename):
-    with open(filename, 'wb') as f:
+
+def submit(imgs, predictions, filename):
+    with open(filename, 'w') as f:
         for i, img in enumerate(imgs):
             img_name = img.split('/')[-1]
-            line = img_name + "\t" + label_map[predictions] + "\r\t"
+            line = img_name + "\t" + predictions[i] + "\r\n"
             f.write(line)
     print("Generate submit done!")
-
-

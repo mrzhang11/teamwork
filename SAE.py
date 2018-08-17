@@ -17,7 +17,9 @@ class SAE:
     def __init__(self, data_generator, params, load_weights=False):
         self.data_generator = data_generator
         self.params = params
-        self.w = self.load_weights() if load_weights else None
+        self.w = None
+        if load_weights:
+            self.load_weights()
 
     def load_weights(self):
         pwd = os.getcwd()
@@ -50,14 +52,17 @@ class SAE:
         best_acc = 0
         best_lambda_val = 0
 
+        print("start  training----------------")
         for lambda_val in self.params['lambdas']:
             acc = 0
             steps = 5
             for step in range(steps):
                 x_train, x_eval, y_train, y_eval, s_train, s_eval = self.data_generator.split_data(split_size=0.2)
-                w = self._calculate_w(s_train, x_train, lambda_val)
-                _, cur_acc = self.predict(w, x_eval, y_eval)
+                self.w = self._calculate_w(s_train, x_train, lambda_val)
+                _, cur_acc = self.predict(x_eval, y_eval)
                 acc += cur_acc
+
+                print("lambda: %f, step: %d, accuracy(eval): %.4f" % (lambda_val, step, cur_acc) )
             acc /= steps
 
             if acc > best_acc:
@@ -70,10 +75,12 @@ class SAE:
         self.w = self._calculate_w(s_train, x_train, best_lambda_val)
         self.save_weights()
 
-    def predict(self, w, x, y=None):
-        w = self.w if w is None else w
-        s_pred = x @ w.T
-        y_pred = nearest_neighbor(s_pred, self.data_generator.attributes)
+    def predict(self, x, y=None):
+        print("start predicting--------------------")
+
+        s_pred = x @ self.w.T
+        y_indices = nearest_neighbor(s_pred, self.data_generator.attributes)
+        y_pred = self.data_generator.classes[y_indices]
         acc = accuracy(y_pred, y) if y is not None else None
 
         return y_pred, acc
